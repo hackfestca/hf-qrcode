@@ -1,0 +1,2 @@
+rootProject.name = "POC-Hackfest-QR_Reader"
+include ':app'
