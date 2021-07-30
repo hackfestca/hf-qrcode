@@ -328,9 +328,9 @@ public class PassportVaccinal {
     }
 
     public int getVaccineCount() {
-        if (this.getLotNumber2() != "") {
+        if (!this.getLotNumber2().equals("")) {
             return 2;
-        } else if (this.getLotNumber1() != "") {
+        } else if (!this.getLotNumber1().equals("")) {
             return 1;
         } else {
             return 0;
