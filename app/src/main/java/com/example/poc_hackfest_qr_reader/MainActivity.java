@@ -142,13 +142,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             // Get the passport info and display on screen
             if (result.getContents() != null) {
-                // QR code scanned successfully
-                PassportVaccinal passportVaccinal = PassportVaccinal.fromShcCode(result.getContents());
+                PassportVaccinal passportVaccinal = null;
+
+                if (result.getContents().startsWith("shc:/")) {
+                    // SHC format
+                    passportVaccinal = PassportVaccinal.fromShcCode(result.getContents());
+                } else if (result.getContents().startsWith("DC") && result.getContents().substring(26, 28).equals("L0")) {
+                    // Check if 2D-Doc format
+                    passportVaccinal = PassportVaccinal.from2DDoc(result.getContents());
+                }
+
                 if (passportVaccinal == null) {
                     Toast.makeText(this, "Erreur de lecture. Veuillez réessayer.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 PassportScan passportScan = new PassportScan(
                         passportVaccinal,
                         (gpsLocation == null ? 0 : gpsLocation.getLatitude()),
@@ -168,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Intent intent = new Intent(MainActivity.this, PassportActivity.class);
                 intent.putExtra(PassportActivity.EXTRA_ENTRY_ID, entryId);
                 startActivity(intent);
+
             }
         }
 

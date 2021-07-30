@@ -164,6 +164,29 @@ public class PassportVaccinal {
         cursor.close();
     }
 
+    public static PassportVaccinal from2DDoc(String docString) {
+        PassportVaccinal passportVaccinal = new PassportVaccinal();
+        passportVaccinal.familyName = getRegexGroup(docString, "L0([a-zA-Z\\s]+).+?L1", 1);
+        passportVaccinal.firstName = getRegexGroup(docString, "L1([a-zA-Z\\s]+).+?L2", 1);
+        passportVaccinal.birthDate = getRegexGroup(docString, "L2([a-zA-Z\\s]+).+?L3", 1);
+        passportVaccinal.familyName = getRegexGroup(docString, "L0([a-zA-Z\\s]+).+?L1", 1);
+        passportVaccinal.scanDate = new Date().toString();
+
+        int nbVaccines = 0;
+        try {
+            nbVaccines = Integer.parseInt(getRegexGroup(docString, "L7([0-9]).*?L8", 1));
+        } catch (Exception e) {}
+
+        if (nbVaccines >= 1) {
+            passportVaccinal.lotNumber1 = "Vaccin 1 reçu";
+        }
+        if (nbVaccines >= 2) {
+            passportVaccinal.lotNumber2 = "Vaccin 2 reçu";
+        }
+
+        return passportVaccinal;
+    }
+
     public static PassportVaccinal fromShcCode(String shcString) {
         StringBuilder result = new StringBuilder();
 
@@ -230,12 +253,16 @@ public class PassportVaccinal {
     }
 
     private String getRegexGroup(String regex) {
-        return getRegexGroup(regex, 1);
+        return getRegexGroup(this.jsonPassport, regex, 1);
     }
 
     private String getRegexGroup(String regex, int numGroup) {
+        return getRegexGroup(this.jsonPassport, regex, numGroup);
+    }
+
+    private static String getRegexGroup(String text, String regex, int numGroup) {
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        Matcher matcher = pattern.matcher(this.jsonPassport);
+        Matcher matcher = pattern.matcher(text);
         for (int i = 0; i < numGroup; i++) {
             if (!matcher.find()) {
                 return "";
